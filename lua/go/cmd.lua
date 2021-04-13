@@ -1,5 +1,7 @@
+--
 -- commands module
 local Job = require("plenary.job")
+local Path = require("plenary.path")
 local window = require("plenary.window.float")
 local str = require("go.str")
 local M = {}
@@ -87,7 +89,6 @@ M.alternate = function()
   elseif str.endswith(file, "_test.go") then
     local root, _ = string.gsub(file, "_test.go", "")
     afile = string.format("%s.go", root)
-    vim.cmd("edit " .. afile)
   else
     local root = vim.fn.expand("%:p:r")
     afile = string.format("%s_test.go", root)
@@ -98,6 +99,55 @@ M.alternate = function()
     return
   end
   vim.cmd("edit " .. afile)
+end
+
+-- :GoBrowse
+M.browse = function()
+  local function parse_uri(uri)
+    local chars = "[_%-%w%.]+"
+    local protocol_schema = "%g+[/@]"
+    local host_schema = chars .. "%." .. chars
+    local path_schema = "" .. chars .. "/" .. chars
+    local host_capture =
+      protocol_schema .. '(' .. host_schema .. ")[:/]" .. path_schema .. "%.git$"
+    local path_capture = protocol_schema .. host_schema .. "[:/](" .. path_schema ..
+                           ")%.git$"
+    local repo = {host = uri:match(host_capture), path = uri:match(path_capture)}
+    if not repo.host then
+      return
+    end
+    return repo
+  end
+
+  local function get_rel_path()
+    local git_root
+    local job = Job:new{"git", "rev-parse", "--show-toplevel"}
+    job:after_success(function(j)
+      git_root = j:result()[1]
+    end)
+    job:sync()
+
+    return Path:new(vim.api.nvim_buf_get_name(0)):make_relative(git_root)
+  end
+
+  local repo
+  local job = Job:new{"git", "remote", "get-url", "origin"}
+  job:after_success(function(j)
+    repo = j:result()[1]
+  end)
+  job:sync()
+
+  local url = parse_uri(repo)
+  if not url then
+    vim.api.nvim_err_writeln(string.format("cannot parse the host name from uri '%s'",
+                                           repo))
+    return
+  end
+
+  local rel_path = get_rel_path()
+  local github_url = "https://" .. url.host .. "/" .. url.path .. "/blob/main/" ..
+                       rel_path
+  Job:new{"xdg-open", github_url}:start()
 end
 
 return M
