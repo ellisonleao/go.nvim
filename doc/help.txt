@@ -1,0 +1,49 @@
+==============================================================================
+1. go.nvim                                                   *go.nvim-go.nvim*
+
+
+Go development plugin for Neovim. Highly unstable.
+==============================================================================
+2. Installation                                         *go.nvim-installation*
+
+
+With [vim-plug](https://github.com/junegunn/vim-plug)
+
+>
+    Plug 'nvim-lua/plenary.nvim'    
+    Plug 'npxbr/go.nvim', {'for': 'go'}
+<
+
+
+With [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
+>
+    use {'npxbr/go.nvim', requires={'nvim-lua/plenary.nvim'}, ft = {'go'}}
+<
+
+
+==============================================================================
+3. Commands                                                 *go.nvim-commands*
+
+
+==============================================================================
+4. :GoRun                                                     *go.nvim-:gorun*
+
+
+Runs current go file in a floating window
+==============================================================================
+5. :GoAlternate                                         *go.nvim-:goalternate*
+
+
+Alternate between a go file and its test file
+==============================================================================
+6. :GoTest                                                   *go.nvim-:gotest*
+
+
+Runs all tests for current file
+==============================================================================
+7. :GoTestNearest                                     *go.nvim-:gotestnearest*
+
+
+Runs test under cursor
+vim:tw=78:ts=8:ft=help:norl:

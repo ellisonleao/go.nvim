@@ -1,14 +1,17 @@
---
 -- commands module
 local Job = require("plenary.job")
 local Path = require("plenary.path")
-local window = require("plenary.window.float")
+local window = require("go.window")
 local str = require("go.str")
 local M = {}
 
+M.close_win = function()
+  vim.api.nvim_win_close(0, true)
+end
+
 -- :GoRun
 M.run = function(file)
-  local win = window.percentage_range_window(tonumber("0.8"), tonumber("0.8"))
+  local win = window.create_window("0.4", "0.4")
   local job_id = vim.api.nvim_open_term(win.bufnr, {})
   Job:new{
     "go",
@@ -19,9 +22,6 @@ M.run = function(file)
     end),
     on_stderr = vim.schedule_wrap(function(_, data)
       vim.api.nvim_chan_send(job_id, data .. "\r\n")
-    end),
-    on_exit = vim.schedule_wrap(function(self)
-      P(self)
     end),
   }:start()
 end
@@ -36,16 +36,24 @@ M.test = function(nearest)
     return
   end
 
-  -- if nearest then
-  --   local line = vim.fn.getline(".")
-  -- end
-  local win = window.percentage_range_window(tonumber("0.5"), tonumber("0.5"))
+  local args = {"test", "-v"}
+
+  -- tries to get test name in current line
+  if nearest then
+    local test_name = str.get_test_name(vim.fn.getline('.'))
+    if test_name == "" then
+      vim.api.nvim_err_writeln("No tests found under cursor. Running all test suite")
+    else
+      table.insert(args, "-run=" .. test_name)
+    end
+  end
+
+  local win = window.create_window("0.4", "0.4")
   local job_id = vim.api.nvim_open_term(win.bufnr, {})
 
   Job:new{
-    "go",
-    "test",
-    "-v",
+    command = "go",
+    args = args,
     on_stdout = vim.schedule_wrap(function(_, data)
       -- local items = vim.fn.json_decode(data)
       -- local tests = {}
@@ -68,9 +76,6 @@ M.test = function(nearest)
     end),
     on_stderr = vim.schedule_wrap(function(_, data)
       vim.api.nvim_chan_send(job_id, data)
-    end),
-    on_exit = vim.schedule_wrap(function(self)
-      P(self)
     end),
   }:start()
 end

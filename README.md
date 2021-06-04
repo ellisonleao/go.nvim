@@ -1,3 +1,36 @@
 # go.nvim
 
-PoC of a golang development plugin for Neovim. Very raw at the moment. Docs are WIP and pretty much the code right now.
+Go development plugin for Neovim. Highly unstable.
+
+# Installation
+
+With [vim-plug](https://github.com/junegunn/vim-plug)
+
+```
+Plug 'nvim-lua/plenary.nvim'
+Plug 'npxbr/go.nvim', {'for': 'go'}
+```
+
+With [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
+```
+use {'npxbr/go.nvim', requires={'nvim-lua/plenary.nvim'}, ft = {'go'}}
+```
+
+# Commands
+
+## :GoRun
+
+Runs current go file in a floating window
+
+## :GoAlternate
+
+Alternate between a go file and its test file
+
+## :GoTest
+
+Runs all tests for current file
+
+## :GoTestNearest
+
+Runs test under cursor

@@ -19,4 +19,14 @@ M.split = function(str, sep)
   return t
 end
 
+-- find a TestXXX name based on the content of the line
+M.get_test_name = function(line)
+  local match = "Test%w+"
+  local test_name = string.match(line, match)
+  if test_name == nil then
+    return ""
+  end
+  return test_name
+end
+
 return M
