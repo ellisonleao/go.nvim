@@ -36,7 +36,7 @@ M.test = function(nearest)
     return
   end
 
-  local args = {"test", "-v"}
+  local args = {"test", "-v", "-json"}
 
   -- tries to get test name in current line
   if nearest then
@@ -48,34 +48,17 @@ M.test = function(nearest)
     end
   end
 
-  local win = window.create_window("0.4", "0.4")
+  local win = window.create_window("0.7", "0.7")
   local job_id = vim.api.nvim_open_term(win.bufnr, {})
-
   Job:new{
     command = "go",
     args = args,
     on_stdout = vim.schedule_wrap(function(_, data)
-      -- local items = vim.fn.json_decode(data)
-      -- local tests = {}
-      -- for _, item in ipairs(items) do
-      --   local test_name = item["Test"]
-      --   if test_name ~= nil then
-      --     if tests[test_name] == nil then
-      --       tests[test_name] = {
-      --         output = string.format("TEST: %s---------------- \n", test_name),
-      --       }
-      --     else
-      --       if item["Action"] == "output" then
-      --         tests[test_name].output = tests[test_name].output .. item["Output"]
-      --       end
-      --     end
-      --   end
-      -- end
-      -- local out = ""
-      vim.api.nvim_chan_send(job_id, data .. "\r\n")
+      -- local output = str.get_test_output(data)
+      vim.api.nvim_chan_send(job_id, data)
     end),
     on_stderr = vim.schedule_wrap(function(_, data)
-      vim.api.nvim_chan_send(job_id, data)
+      vim.api.nvim_err_writeln(data)
     end),
   }:start()
 end
