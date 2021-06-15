@@ -8,6 +8,7 @@ M.on_attach = function(client, bufnr)
     {"n", "gd", [[<Cmd>lua vim.lsp.buf.definition()<CR>]], opts},
     {"n", "gD", [[<Cmd>lua vim.lsp.buf.declaration()<CR>]], opts},
     {"n", "gR", [[<Cmd>lua vim.lsp.buf.references()<CR>]], opts},
+    {"n", "gr", [[<Cmd>lua vim.lsp.buf.rename()<CR>]], opts},
   }
 
   for _, map in pairs(mappings) do
@@ -48,7 +49,10 @@ M.configure_lsp = function(config)
 
   -- calling the lsp config for go
   local lspconfig = require("lspconfig")
-  local cfg = {on_attach = config.lsp.on_attach, capabilities = config.lsp.capabilities}
+  local cfg = {
+    on_attach = config.lsp.on_attach,
+    capabilities = config.lsp.capabilities(),
+  }
   lspconfig["go"].setup(cfg)
 end
 
