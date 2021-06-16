@@ -9,6 +9,8 @@ M.on_attach = function(client, bufnr)
     {"n", "gD", [[<Cmd>lua vim.lsp.buf.declaration()<CR>]], opts},
     {"n", "gR", [[<Cmd>lua vim.lsp.buf.references()<CR>]], opts},
     {"n", "gr", [[<Cmd>lua vim.lsp.buf.rename()<CR>]], opts},
+    {"n", "gn", [[<Cmd>lua vim.lsp.diagnostic.goto_next()<CR>]], opts},
+    {"n", "gp", [[<Cmd>lua vim.lsp.diagnostic.goto_prev()<CR>]], opts},
   }
 
   for _, map in pairs(mappings) do
