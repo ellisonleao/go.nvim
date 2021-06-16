@@ -3,6 +3,7 @@ local Job = require("plenary.job")
 local Path = require("plenary.path")
 local window = require("go.window")
 local str = require("go.str")
+local util = require("go.util")
 local M = {}
 
 M.close_win = function()
@@ -65,10 +66,6 @@ end
 
 -- :GoAlternate
 M.alternate = function()
-  local function file_exists(path)
-    return vim.fn.filereadable(path) == 0 and vim.fn.bufexists(path) == 0
-  end
-
   local afile
   local file = vim.fn.expand("%")
   if file == "" then
@@ -82,7 +79,7 @@ M.alternate = function()
     afile = string.format("%s_test.go", root)
   end
 
-  if file_exists(afile) then
+  if util.file_exists(afile) then
     vim.api.nvim_err_writeln("alternate file not found")
     return
   end
@@ -136,6 +133,41 @@ M.browse = function()
   local github_url = "https://" .. url.host .. "/" .. url.path .. "/blob/main/" ..
                        rel_path
   Job:new{"xdg-open", github_url}:start()
+end
+
+-- :GoLint
+M.lint = function()
+  local args = {"run"}
+
+  if not vim.fn.executable("golangci-lint") then
+    vim.api.nvim_err_writeln("golangci-lint not found. Please install it first")
+    return
+  end
+
+  local cfg = ".golangci.yml"
+  if util.file_exists(cfg) then
+    table.insert(args, "-c", cfg)
+  end
+
+  Job:new{
+    command = "golangci-lint",
+    args = args,
+    on_stderr = vim.schedule_wrap(function(error, _)
+      vim.api.nvim_err_writeln(error)
+    end),
+    on_exit = vim.schedule_wrap(function(j, code, _)
+      if code == 0 then
+        util.print_msg("Function", "[PASS]")
+        return
+      else
+        local win = window.create_window("0.7", "0.7")
+        vim.api.nvim_open_term(win.bufnr, {})
+        vim.api.nvim_buf_set_option(win.bufnr, "modifiable", true)
+        vim.api.nvim_buf_set_lines(win.bufnr, 0, -1, false, j:result())
+        vim.api.nvim_buf_set_option(win.bufnr, "modifiable", false)
+      end
+    end),
+  }:start()
 end
 
 return M

@@ -2,6 +2,11 @@
 1. go.nvim                                                   *go.nvim-go.nvim*
 
 
+┏━╸┏━┓ ┏┓╻╻ ╻╻┏┳┓
+┃╺┓┃ ┃ ┃┗┫┃┏┛┃┃┃┃
+┗━┛┗━┛╹╹ ╹┗┛ ╹╹ ╹
+
+
 Go development plugin for Neovim. Highly unstable.
 ==============================================================================
 2. Installation                                         *go.nvim-installation*
@@ -46,4 +51,10 @@ Runs all tests for current file
 
 
 Runs test under cursor
+==============================================================================
+8. :GoLint                                                   *go.nvim-:golint*
+
+
+Runs [golangci-lint](https://github.com/golangci/golangci-lint) for current
+folder.
 vim:tw=78:ts=8:ft=help:norl:

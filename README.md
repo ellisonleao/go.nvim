@@ -34,3 +34,7 @@ Runs all tests for current file
 ## :GoTestNearest
 
 Runs test under cursor
+
+## :GoLint
+
+Runs [golangci-lint](https://github.com/golangci/golangci-lint) for current folder.
