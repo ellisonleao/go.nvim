@@ -200,6 +200,7 @@ M.play = function(from, to)
     local id = j:result()[1]
     local play_url = "https://play.golang.org/p/" .. id
     util.print_msg("Function", "snippet uploaded: " .. play_url)
+    Job:new{"xdg-open", play_url}:start()
   end)
 
   job:start()
