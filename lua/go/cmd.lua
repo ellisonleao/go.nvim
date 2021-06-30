@@ -132,7 +132,7 @@ M.browse = function()
   local rel_path = get_rel_path()
   local github_url = "https://" .. url.host .. "/" .. url.path .. "/blob/main/" ..
                        rel_path
-  Job:new{"xdg-open", github_url}:start()
+  util.open_browser(github_url)
 end
 
 -- :GoLint
@@ -200,7 +200,7 @@ M.play = function(from, to)
     local id = j:result()[1]
     local play_url = "https://play.golang.org/p/" .. id
     util.print_msg("Function", "snippet uploaded: " .. play_url)
-    Job:new{"xdg-open", play_url}:start()
+    util.open_browser(play_url)
   end)
 
   job:start()
@@ -208,7 +208,23 @@ end
 
 -- :GoReportGithubIssue
 M.open_issue = function()
-  Job:new{"xdg-open", "https://github.com/npxbr/go.nvim/issues/new"}:start()
+  util.open_browser("https://github.com/npxbr/go.nvim/issues/new")
+end
+
+-- :GoDocBrowser
+M.open_doc = function()
+  local pkg = vim.fn.getline(".")
+  -- clean line
+  pkg = string.gsub(pkg, "[\"| ]", "")
+
+  local base_url = "https://pkg.go.dev/"
+
+  if pkg == "" or pkg == nil then
+    vim.api.nvim_err_writeln("could not find pkg name")
+    return
+  end
+
+  util.open_browser(base_url .. pkg)
 end
 
 return M
