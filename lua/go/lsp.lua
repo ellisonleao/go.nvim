@@ -51,10 +51,7 @@ M.configure_lsp = function(config)
 
   -- calling the lsp config for go
   local lspconfig = require("lspconfig")
-  local cfg = {
-    on_attach = config.lsp.on_attach,
-    capabilities = config.lsp.capabilities(),
-  }
+  local cfg = {on_attach = config.lsp.on_attach, capabilities = config.lsp.capabilities}
   lspconfig["go"].setup(cfg)
 end
 

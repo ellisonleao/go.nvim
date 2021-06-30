@@ -1,12 +1,12 @@
 -- local cfg = require("go.cfg")
 local lsp = require("go.lsp")
-local cfg = require("go.cfg")
 
 local M = {}
 
 M.config = function(config)
-  if config ~= nil then
-    cfg = config
+  local cfg = config
+  if cfg == nil then
+    cfg = require("go.cfg")
   end
   lsp.configure_lsp(cfg)
 end
