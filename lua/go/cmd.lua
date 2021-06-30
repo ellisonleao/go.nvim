@@ -170,4 +170,39 @@ M.lint = function()
   }:start()
 end
 
+-- :GoPlay 
+M.play = function(from, to)
+  local url = "https://play.golang.org/share"
+
+  if not vim.fn.executable("curl") then
+    vim.api.nvim_err_writeln("You need curl installed to create a golang play snippet")
+    return
+  end
+
+  local tempfile = vim.fn.tempname()
+  local content = vim.fn.join(vim.fn.getline(from, to), "\n")
+  vim.fn.writefile(vim.fn.split(content, "\n"), tempfile, "b")
+
+  local job = Job:new{
+    command = "curl",
+    args = {"-X", "POST", url, "--data-binary", "@" .. tempfile},
+    on_stderr = vim.schedule_wrap(function(error, _)
+      if error ~= nil then
+        vim.api.nvim_err_writeln("error on creating go play snippet: " .. error)
+      end
+    end),
+    on_exit = vim.schedule_wrap(function()
+      vim.fn.delete(tempfile)
+    end),
+  }
+
+  job:after_success(function(j)
+    local id = j:result()[1]
+    local play_url = "https://play.golang.org/p/" .. id
+    util.print_msg("Function", "snippet uploaded: " .. play_url)
+  end)
+
+  job:start()
+end
+
 return M

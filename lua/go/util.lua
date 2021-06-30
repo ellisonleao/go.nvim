@@ -3,7 +3,9 @@ local M = {}
 
 M.print_msg = function(highlight, msg)
   local cmd = string.format([[echohl %s | echo "%s" | echohl None]], highlight, msg)
-  vim.cmd(cmd)
+  vim.schedule(function()
+    vim.cmd(cmd)
+  end)
 end
 
 M.file_exists = function(path)
