@@ -206,4 +206,9 @@ M.play = function(from, to)
   job:start()
 end
 
+-- :GoReportGithubIssue
+M.open_issue = function()
+  Job:new{"xdg-open", "https://github.com/npxbr/go.nvim/issues/new"}:start()
+end
+
 return M
