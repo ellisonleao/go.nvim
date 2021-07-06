@@ -1,5 +1,6 @@
 -- local cfg = require("go.cfg")
 local lsp = require("go.lsp")
+local treesitter = require("go.treesitter")
 
 local M = {}
 
@@ -8,6 +9,11 @@ M.config = function(config)
   if cfg == nil then
     cfg = require("go.cfg")
   end
-  lsp.configure_lsp(cfg)
+
+  -- setup lsp
+  lsp.setup(cfg)
+
+  -- setup treesitter
+  treesitter.setup()
 end
 return M

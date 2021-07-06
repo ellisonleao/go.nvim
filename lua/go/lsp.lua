@@ -1,5 +1,16 @@
 -- lsp module
--- adding neovim lsp support if installed
+local ok = pcall(vim.cmd, [[packadd nvim-lspconfig]])
+if not ok then
+  vim.api.nvim_err_writeln("nvim-lspconfig is required")
+  return
+end
+
+-- check if gopls is installed
+if not vim.fn.executable("gopls") then
+  vim.api.nvim_err_writeln("gopls is required. Call :GoplsInstall to install it")
+  return
+end
+
 local M = {}
 
 M.on_attach = function(client, bufnr)
@@ -27,32 +38,6 @@ M.on_attach = function(client, bufnr)
     ]], false)
   end
 
-end
-
-M.configure_lsp = function(config)
-  -- required: nvim-lspconfig && gopls
-  local ok = pcall(vim.cmd, [[packadd nvim-lspconfig]])
-  if not ok then
-    vim.api.nvim_err_writeln("nvim-lspconfig is required")
-    return
-  end
-
-  -- check if gopls is installed
-  if not vim.fn.executable("gopls") then
-    vim.api.nvim_err_writeln("gopls is required. Call :GoPlsInstall to install it")
-    return
-  end
-
-  -- setting omnifunc
-  local omnifunc = vim.o.omnifunc
-  if omnifunc == "" then
-    vim.o.omnifunc = "v:lua.lsp.omnifunc"
-  end
-
-  -- calling the lsp config for go
-  local lspconfig = require("lspconfig")
-  local cfg = {on_attach = config.lsp.on_attach, capabilities = config.lsp.capabilities}
-  lspconfig["go"].setup(cfg)
 end
 
 M.capabilities = function()
@@ -87,6 +72,20 @@ M.install_gopls = function()
   vim.fn.termopen("set -e\n" .. cmd)
   vim.o.shell = shell
   vim.cmd("startinsert")
+end
+
+M.setup = function(config)
+
+  -- setting omnifunc
+  local omnifunc = vim.o.omnifunc
+  if omnifunc == "" then
+    vim.o.omnifunc = "v:lua.lsp.omnifunc"
+  end
+
+  -- calling the lsp config for go
+  local lspconfig = require("lspconfig")
+  local cfg = {on_attach = config.lsp.on_attach, capabilities = config.lsp.capabilities}
+  lspconfig["go"].setup(cfg)
 end
 
 return M
