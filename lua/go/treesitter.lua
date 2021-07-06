@@ -20,14 +20,6 @@ M.setup = function()
         end,
         disable = {},
       },
-      -- swap = {
-      --   module_path = "go.swap",
-      --   enable = true,
-      --   disable = {},
-      --   is_supported = function()
-      --     return true
-      --   end,
-      -- },
     },
   })
 end
