@@ -5,6 +5,7 @@ local treesitter = require("go.treesitter")
 local M = {}
 
 M.config = function(config)
+  -- TODO: validate config
   local cfg = config
   if cfg == nil then
     cfg = require("go.cfg")

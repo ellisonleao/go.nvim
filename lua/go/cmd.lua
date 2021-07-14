@@ -4,6 +4,7 @@ local Path = require("plenary.path")
 local window = require("go.window")
 local str = require("go.str")
 local util = require("go.util")
+local ns = vim.api.nvim_create_namespace("go-nvim")
 local M = {}
 
 M.close_win = function()
@@ -37,7 +38,7 @@ M.test = function(nearest)
     return
   end
 
-  local args = {"test", "-v", "-json"}
+  local args = {"test", "-v"}
 
   -- tries to get test name in current line
   if nearest then
@@ -170,7 +171,7 @@ M.lint = function()
   }:start()
 end
 
--- :GoPlay 
+-- :GoPlay
 M.play = function(from, to)
   local url = "https://play.golang.org/share"
 
@@ -225,6 +226,53 @@ M.open_doc = function()
   end
 
   util.open_browser(base_url .. pkg)
+end
+
+-- :GoCoverageToggle
+M.cover = function(clear)
+  local current_file = vim.fn.expand("%:t")
+  local test_file = current_file .. "_test.go"
+  if not util.file_exists(test_file) then
+    print("current file does not contains a test file")
+    return
+  end
+
+  if clear == "!" then
+    vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
+    return
+  end
+
+  local tmpfile = vim.fn.tempname()
+  local test_path = "./" .. vim.fn.expand("%:h")
+  local args = {"test", "-cover", "-coverprofile=" .. tmpfile, test_path}
+
+  Job:new{
+    command = "go",
+    args = args,
+    on_stderr = vim.schedule_wrap(function(error, _)
+      if error ~= nil then
+        vim.api.nvim_err_writeln("error on creating coverprofile " .. error)
+      end
+    end),
+    on_exit = vim.schedule_wrap(function()
+      local out = util.parse_cover(tmpfile)
+
+      -- paint whole buffer in gray first
+      vim.highlight.range(0, ns, "NonText", {0, 0}, {vim.fn.line("$"), 1000})
+
+      for _, item in pairs(out) do
+        local startr = {item.line0, 0}
+        local endr = {item.line1, 1000} -- TODO: grab line length
+        local color = "String" -- green color
+        if item.ok == "0" then
+          color = "Error"
+        end
+        vim.highlight.range(0, ns, color, startr, endr, 'l')
+      end
+      vim.fn.delete(tmpfile)
+    end),
+  }:start()
+
 end
 
 return M

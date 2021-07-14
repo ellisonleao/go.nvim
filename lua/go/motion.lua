@@ -11,13 +11,13 @@ M.attach = function(bufnr)
     {
       "n",
       "[[",
-      ":lua require('go.motion').goto_next_start('@function.inner')<CR>",
+      ":lua require('go.motion').goto_previous_start('@function.inner')<CR>",
       opts,
     },
     {
       "n",
       "]]",
-      ":lua require('go.motion').goto_previous_start('@function.inner')<CR>",
+      ":lua require('go.motion').goto_next_start('@function.inner')<CR>",
       opts,
     },
   }

@@ -12,3 +12,5 @@ vim.cmd(
   [[command! -nargs=0 -range=% GoPlay lua require("go.cmd").play(<line1>, <line2>)]])
 vim.cmd([[command! -nargs=0 GoReportGithubIssue lua require("go.cmd").open_issue()]])
 vim.cmd([[command! -nargs=0 GoDocBrowser lua require("go.cmd").open_doc()]])
+vim.cmd(
+  [[command! -nargs=0 -bang GoCoverageToggle lua require("go.cmd").cover("<bang>")]])
