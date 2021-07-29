@@ -147,20 +147,23 @@ M.lint = function()
 
   local cfg = ".golangci.yml"
   if util.file_exists(cfg) then
-    table.insert(args, "-c", cfg)
+    table.insert(args, "-c")
+    table.insert(args, cfg)
   end
 
+  util.print_msg("Function", "Running linter...")
   Job:new{
     command = "golangci-lint",
     args = args,
     on_stderr = vim.schedule_wrap(function(error, _)
-      vim.api.nvim_err_writeln(error)
+      vim.api.nvim_err_writeln(string.format("%s", error))
     end),
     on_exit = vim.schedule_wrap(function(j, code, _)
       if code == 0 then
         util.print_msg("Function", "[PASS]")
         return
       else
+        util.print_msg("Error", "Some errors were found")
         local win = window.create_window("0.7", "0.7")
         vim.api.nvim_open_term(win.bufnr, {})
         vim.api.nvim_buf_set_option(win.bufnr, "modifiable", true)

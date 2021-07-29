@@ -1,5 +1,6 @@
 -- util functions
 local Job = require("plenary.job")
+local Path = require("plenary.path")
 local M = {}
 
 M.print_msg = function(highlight, msg)
@@ -10,7 +11,8 @@ M.print_msg = function(highlight, msg)
 end
 
 M.file_exists = function(path)
-  return vim.fn.filereadable(path) == 0 and vim.fn.bufexists(path) == 0
+  local f = Path:new(path)
+  return f:exists()
 end
 
 M.open_browser = function(url)
