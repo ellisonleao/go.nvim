@@ -14,3 +14,5 @@ vim.cmd([[command! -nargs=0 GoReportGithubIssue lua require("go.cmd").open_issue
 vim.cmd([[command! -nargs=0 GoDocBrowser lua require("go.cmd").open_doc()]])
 vim.cmd(
   [[command! -nargs=0 -bang GoCoverageToggle lua require("go.cmd").cover("<bang>")]])
+vim.cmd([[command! -nargs=1 GoAddTags lua require("go.cmd").tags("add", <f-args>)]])
+vim.cmd([[command! -nargs=0 GoRemoveTags lua require("go.cmd").tags("remove", "")]])

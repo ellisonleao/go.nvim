@@ -275,7 +275,53 @@ M.cover = function(clear)
       vim.fn.delete(tmpfile)
     end),
   }:start()
+end
 
+-- :GoAddTags and :GoRemoveTags
+M.tags = function(action, tags)
+  local current_file = vim.fn.expand("%")
+  local cmd = "gomodifytags"
+  if not vim.fn.executable(cmd) then
+    util.print_msg("Function", "Installing gomodifytags..")
+    Job:new{
+      command = "go",
+      args = {"get", "github.com/fatih/gomodifytags"},
+      on_stderr = vim.schedule_wrap(function()
+        vim.api.nvim_err_writeln("Error on installing gomodifytags tool")
+      end),
+      on_exit = vim.schedule_wrap(function(j, code, _)
+        if code == 0 then
+          return
+        end
+        util.print_msg("Function", "gomodifytags installed")
+      end),
+    }:sync()
+  end
+
+  local line = vim.fn.getline(".")
+  local groups = "type%s(%a+)%sstruct"
+  local _, _, struct_name = string.find(line, groups)
+
+  local base_action = "-add-tags"
+  if action == "remove" then
+    base_action = "-clear-tags"
+  end
+
+  local args = {"-file", current_file, "-struct", struct_name, base_action, tags}
+  local buffer = {}
+  Job:new{
+    command = cmd,
+    args = args,
+    on_stdout = vim.schedule_wrap(function(_, data, _)
+      table.insert(buffer, data)
+    end),
+    on_stderr = vim.schedule_wrap(function(_, error)
+      vim.api.nvim_err_writeln(error)
+    end),
+    on_exit = vim.schedule_wrap(function(j, code, _)
+      vim.api.nvim_buf_set_lines(0, 0, -1, false, buffer)
+    end),
+  }:start()
 end
 
 return M
